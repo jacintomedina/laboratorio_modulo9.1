@@ -1,101 +1,83 @@
-import { LineaTicket, TipoIva, porcentajesIva } from "./modelo";
+import {
+  LineaTicket,
+  porcentajesIva,
+  ResultadoLineaTicket,
+  TotalPorTipoIva,
+} from "./modelo";
 
-const productos: LineaTicket[] = [
-  {
-    producto: {
-      nombre: "Legumbres",
-      precio: 2,
-      tipoIva: "general",
+export const obtenerTotalSinIva = (lineasTicket: LineaTicket[]): number => {
+  const totalSinIva = lineasTicket.reduce(
+    (acc: number, lineaTicket: LineaTicket) => {
+      const subtotal = lineaTicket.cantidad * lineaTicket.producto.precio;
+      acc = acc + subtotal;
+      // return acc += subtotal
+      return acc;
     },
-    cantidad: 2,
-  },
-  {
-    producto: {
-      nombre: "Perfume",
-      precio: 20,
-      tipoIva: "general",
-    },
-    cantidad: 3,
-  },
-  {
-    producto: {
-      nombre: "Leche",
-      precio: 1,
-      tipoIva: "superreducidoC",
-    },
-    cantidad: 6,
-  },
-  {
-    producto: {
-      nombre: "Lasaña",
-      precio: 5,
-      tipoIva: "superreducidoA",
-    },
-    cantidad: 1,
-  },
-];
+    0
+  );
 
-interface ResultadoLineaTicket {
-  nombre: string;
-  cantidad: number;
-  precioSinIva: number;
-  tipoIva: TipoIva;
-  precioConIva: number;
-}
-
-interface ResultadoTotalTicket {
-  totalSinIva: number;
-  totalConIva: number;
-  totalIva: number;
-}
-
-interface TotalPorTipoIva {
-  tipoIva: TipoIva;
-  cuantia: number;
-}
-
-interface TicketFinal {
-  lineas: ResultadoLineaTicket[];
-  total: ResultadoTotalTicket;
-  desgloseIva: TotalPorTipoIva[];
-}
-
-export const calcularIvaProducto = (precio: number, tipoIva: TipoIva) => {
-  const iva = porcentajesIva(tipoIva);
-  return precio * iva;
+  return totalSinIva;
 };
 
-const calcularLineaTicket = (
-  producto: string,
-  precio: number,
-  cantidad: number,
-  tipoIva: TipoIva
-): ResultadoLineaTicket[] => {
-  let lineaTicket: ResultadoLineaTicket[] = [];
-  const productoNombre = producto;
-  const precioSinIva = precio * cantidad;
-  const Iva = tipoIva;
-  const precioConIva = calcularIvaProducto(precioSinIva, Iva);
+export const obtenerTotalIva = (lineasTicket: LineaTicket[]): number => {
+  const totalIva = lineasTicket.reduce(
+    (acc: number, lineaTicket: LineaTicket) => {
+      const subtotal = lineaTicket.cantidad * lineaTicket.producto.precio;
+      const iva = subtotal * porcentajesIva(lineaTicket.producto.tipoIva);
+      acc = acc + iva;
+      return acc;
+    },
+    0
+  );
 
-  lineaTicket.push({
-    nombre: productoNombre,
-    precioSinIva: precioSinIva,
-    tipoIva: Iva,
-    cantidad: cantidad,
-    precioConIva: precioConIva,
+  return totalIva;
+};
+
+export const obtenerDesgloseIva = (
+  lineasTicket: LineaTicket[]
+): TotalPorTipoIva[] => {
+  const desgloseIva = lineasTicket.reduce((acc: TotalPorTipoIva[], linea) => {
+    const { tipoIva, precio } = linea.producto;
+    const cantidad = linea.cantidad;
+    const porcentaje = porcentajesIva(tipoIva);
+
+    const ivaLinea = precio * cantidad * porcentaje;
+
+    const ivaExistente = acc.find((item) => item.tipoIva === tipoIva);
+
+    if (ivaExistente) {
+      ivaExistente.cuantia += ivaLinea;
+    } else {
+      acc.push({ tipoIva: tipoIva, cuantia: ivaLinea });
+    }
+    return acc;
+  }, []);
+
+  desgloseIva.forEach((item) => {
+    item.cuantia = parseInt(item.cuantia.toFixed(2));
+  });
+
+  return desgloseIva;
+};
+
+export const obtenerLineaTicket = (
+  lineasTicket: LineaTicket[]
+): ResultadoLineaTicket[] => {
+  const lineaTicket = lineasTicket.map((linea: LineaTicket) => {
+    const productoNombre = linea.producto.nombre;
+    const cantidad = linea.cantidad;
+    const precioSinIva = linea.producto.precio * cantidad;
+    const tipoIva = linea.producto.tipoIva;
+    const precioConIva = precioSinIva * porcentajesIva(linea.producto.tipoIva);
+
+    return {
+      nombre: productoNombre,
+      cantidad: cantidad,
+      precioSinIva: precioSinIva,
+      tipoIva: tipoIva,
+      precioConIva: precioConIva,
+    };
   });
 
   return lineaTicket;
-};
-
-const calculaTicket = (lineasTicket: LineaTicket[]): TicketFinal[] => {
-  let ticketFinal: TicketFinal[] = [];
-
-  for (let i = 0; i < lineasTicket.length; i++) {
-    if (!lineasTicket) {
-      throw "El ticket está vacío";
-    }
-    const linea = lineasTicket[i];
-  }
-  return;
 };

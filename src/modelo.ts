@@ -35,3 +35,37 @@ export interface LineaTicket {
   producto: Producto;
   cantidad: number;
 }
+
+export interface ResultadoLineaTicket {
+  nombre: string;
+  cantidad: number;
+  precioSinIva: number;
+  tipoIva: TipoIva;
+  precioConIva: number;
+}
+
+interface ResultadoTotalTicket {
+  totalSinIva: number;
+  totalConIva: number;
+  totalIva: number;
+}
+
+export interface TotalPorTipoIva {
+  tipoIva: TipoIva;
+  cuantia: number;
+}
+
+/*
+  [
+    {
+      cuantia: 10.25,
+      tipoIva: 'general',
+    }
+  ]
+*/
+
+export interface TicketFinal {
+  lineas: ResultadoLineaTicket[];
+  total: ResultadoTotalTicket;
+  desgloseIva: TotalPorTipoIva[];
+}
