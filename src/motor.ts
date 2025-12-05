@@ -36,6 +36,20 @@ export const obtenerTotalIva = (lineasTicket: LineaTicket[]): number => {
 export const obtenerDesgloseIva = (
   lineasTicket: LineaTicket[]
 ): TotalPorTipoIva[] => {
+  /* SOLUCIÓN ALTERNATIVA
+
+    const desgloseIva: TotalPorTipoIva[] = listaTiposIva.map((tipoIva) => {
+
+    const productosFiltradosPorTipoIva = lineasTicket.filter((lineaTicket) => lineaTicket.producto.tipoIva === tipoIva);
+    return {
+      cuantia: obtenerTotalIva(productosFiltradosPorTipoIva),
+      tipoIva: tipoIva
+    };
+  })
+
+  return desgloseIva.filter(producto => producto.cuantia > 0);
+  */
+
   const desgloseIva = lineasTicket.reduce((acc: TotalPorTipoIva[], linea) => {
     const { tipoIva, precio } = linea.producto;
     const cantidad = linea.cantidad;
@@ -68,7 +82,8 @@ export const obtenerLineaTicket = (
     const cantidad = linea.cantidad;
     const precioSinIva = linea.producto.precio * cantidad;
     const tipoIva = linea.producto.tipoIva;
-    const precioConIva = precioSinIva * porcentajesIva(linea.producto.tipoIva);
+    const precioConIva =
+      precioSinIva * porcentajesIva(linea.producto.tipoIva) + precioSinIva;
 
     return {
       nombre: productoNombre,

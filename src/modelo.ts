@@ -9,13 +9,13 @@ export type TipoIva =
 export const porcentajesIva = (tipoIva: TipoIva): number => {
   switch (tipoIva) {
     case "general":
-      return 1.21;
+      return 0.21;
     case "reducido":
-      return 1.1;
+      return 0.1;
     case "superreducidoA":
-      return 1.05;
+      return 0.05;
     case "superreducidoB":
-      return 1.04;
+      return 0.04;
     case "superreducidoC":
       return 0;
     case "sinIva":
@@ -55,6 +55,21 @@ export interface TotalPorTipoIva {
   cuantia: number;
 }
 
+//----------------------------------------------//
+
+/* SOLUCIÓN ALTERNATIVA
+
+export const listaTiposIva: TipoIva[] = [
+  "general",
+  "reducido",
+  "sinIva",
+  "superreducidoA",
+  "superreducidoB",
+  "superreducidoC"
+];
+
+*/
+//----------------------------------------------//
 /*
   [
     {
